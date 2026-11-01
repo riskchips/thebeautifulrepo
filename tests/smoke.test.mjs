@@ -5,6 +5,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {once} from 'node:events';
 import {createServer} from '../src/server.mjs';
+import * as catalog from '../src/domain/catalog.mjs';
 
 // Infrastructure smoke tests. Add regression tests for the defects you investigate.
 test('local sandbox infrastructure',async t=>{
@@ -19,6 +20,10 @@ test('local sandbox infrastructure',async t=>{
     await t.test('HTML and browser assets are served',async()=>{for(const path of ['/','/app.js','/style.css']){const r=await fetch(base+path);assert.equal(r.status,200);assert.ok((await r.text()).length>100);} });
     await t.test('all read endpoints return parseable JSON',async()=>{for(const path of ['/api/dashboard','/api/events','/api/bookings','/api/inventory','/api/schedule','/api/telemetry']){const r=await fetch(base+path);assert.equal(r.status,200);assert.ok(await r.json());}});
     await t.test('dashboard occupancy is occupied seats divided by capacity',async()=>{const data=await (await fetch(base+'/api/dashboard')).json();assert.deepEqual(data.events.map(event=>event.occupancy),[92,13,0]);});
+    await t.test('event explorer paginates all events in start-date order',async()=>{const first=await (await fetch(base+'/api/events?page=1&size=2')).json(),second=await (await fetch(base+'/api/events?page=2&size=2')).json();assert.equal(first.total,3);assert.deepEqual(first.events.map(event=>event.id),['rovaris','aerovate']);assert.deepEqual(second.events.map(event=>event.id),['celestial-dive']);});
+    await t.test('event explorer applies search and tag filters',async()=>{const search=await (await fetch(base+'/api/events?q=rocket')).json(),tag=await (await fetch(base+'/api/events?tag=stars')).json();assert.deepEqual(search.events.map(event=>event.id),['aerovate']);assert.deepEqual(tag.events.map(event=>event.id),['celestial-dive']);});
+    await t.test('catalog filters require all tags, ignore waitlisted seats, and list unique tags',async()=>{const events=[{id:'one',capacity:2,tags:['Build','Rover']},{id:'two',capacity:3,tags:['build']}],bookings=[{eventId:'one',seats:2,status:'waitlisted'},{eventId:'two',seats:3,status:'confirmed'}];assert.deepEqual(catalog.filterByTag(events,['build','rover']).map(event=>event.id),['one']);assert.deepEqual(catalog.availableEvents(events,bookings).map(event=>event.id),['one']);assert.deepEqual(catalog.distinctTags(events),['build','rover']);});
+    await t.test('event explorer availability filter returns events with open seats',async()=>{const data=await (await fetch(base+'/api/events?available=true')).json();assert.equal(data.total,3);assert.deepEqual(data.events.map(event=>event.id),['rovaris','aerovate','celestial-dive']);});
     await t.test('operation metadata exposes names and contracts',async()=>{const operations=await (await fetch(base+'/api/operations')).json();assert.ok(operations.length>0);assert.ok(operations.every(op=>op.module&&op.name&&op.contract&&Array.isArray(op.example)));});
     await t.test('diagnostics runs an allowed operation',async()=>{const r=await post('/api/diagnostics',{module:'validation',name:'isVitEmail',args:['demo@vit.ac.in']});assert.equal(r.status,200);assert.deepEqual(await r.json(),{result:true});});
     await t.test('unknown API and diagnostic names are rejected',async()=>{assert.equal((await fetch(base+'/api/missing')).status,404);assert.equal((await post('/api/diagnostics',{module:'validation',name:'missing',args:[]})).status,404);});
