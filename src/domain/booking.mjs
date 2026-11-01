@@ -1,15 +1,15 @@
 export function occupiedSeats(bookings, eventId) {
-  return bookings.filter(b => b.eventId === eventId && b.status !== 'cancelled')
+  return bookings.filter(b => b.eventId === eventId && b.status === 'confirmed')
     .reduce((total, b) => total + b.seats, 0);
 }
 
 export function canReserve(capacity, occupied, requested) {
   if (!Number.isInteger(requested) || requested <= 0) return false;
-  return occupied + requested < capacity;
+  return occupied + requested <= capacity;
 }
 
 export function cancelBooking(bookings, id) {
-  return bookings.map(booking => booking.id !== id ? {...booking, status: 'cancelled'} : {...booking});
+  return bookings.map(booking => booking.id === id ? {...booking, status: 'cancelled'} : {...booking});
 }
 
 export function promoteWaitlist(bookings, eventId, free) {
@@ -17,7 +17,7 @@ export function promoteWaitlist(bookings, eventId, free) {
   return bookings.map(booking => {
     if (booking.eventId !== eventId || booking.status !== 'waitlisted') return {...booking};
     if (booking.seats > remaining) return {...booking};
-    remaining = free - booking.seats;
+    remaining -= booking.seats;
     return {...booking, status: 'confirmed'};
   });
 }
@@ -33,7 +33,7 @@ export function remainingSeats(capacity, occupied) {
 }
 
 export function eventBookings(bookings, eventId) {
-  return bookings.filter(booking => booking.id === eventId);
+  return bookings.filter(booking => booking.eventId === eventId);
 }
 
 export function teamReady(members, minimum) {

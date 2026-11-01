@@ -46,12 +46,14 @@ export function cancel(state,id) {
   if(!target) throw new InputError('Booking not found.',404);
   const event=getEvent(state,target.eventId);
   state.bookings=b.cancelBooking(state.bookings,id);
-  const free=b.remainingSeats(event.capacity,b.occupiedSeats(state.bookings,event.id));
-  const previous=new Map(state.bookings.map(x=>[x.id,x.status]));
-  state.bookings=b.promoteWaitlist(state.bookings,event.id,free).map(record=>{
-    if(previous.get(record.id)==='waitlisted'&&record.status==='confirmed') return {...record,paidPaise:quote(state,event,record.seats).totalPaise,updatedAt:Date.now()};
-    return record;
-  });
+  if(target.status==='confirmed') {
+    const free=b.remainingSeats(event.capacity,b.occupiedSeats(state.bookings,event.id));
+    const previous=new Map(state.bookings.map(x=>[x.id,x.status]));
+    state.bookings=b.promoteWaitlist(state.bookings,event.id,free).map(record=>{
+      if(previous.get(record.id)==='waitlisted'&&record.status==='confirmed') return {...record,paidPaise:quote(state,event,record.seats).totalPaise,updatedAt:Date.now()};
+      return record;
+    });
+  }
   return {bookings:b.eventBookings(state.bookings,event.id)};
 }
 export function dashboard(state) {
