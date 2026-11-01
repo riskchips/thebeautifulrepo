@@ -1,0 +1,11 @@
+import * as validation from './domain/validation.mjs';
+import * as catalog from './domain/catalog.mjs';
+import * as booking from './domain/booking.mjs';
+import * as pricing from './domain/pricing.mjs';
+import * as inventory from './domain/inventory.mjs';
+import * as schedule from './domain/schedule.mjs';
+import * as telemetry from './domain/telemetry.mjs';
+import * as analytics from './domain/analytics.mjs';
+import * as storage from './domain/storage.mjs';
+export {validation,catalog,booking,pricing,inventory,schedule,telemetry,analytics,storage};
+export const registry={validation,catalog,booking,pricing,inventory,schedule,telemetry,analytics,storage};

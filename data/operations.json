@@ -1,0 +1,1104 @@
+[
+  {
+    "module": "validation",
+    "name": "normalizeEmail",
+    "params": "value",
+    "contract": "Trim surrounding whitespace and lowercase the entire email.",
+    "example": [
+      "  Ada@VIT.ac.in  "
+    ]
+  },
+  {
+    "module": "validation",
+    "name": "isVitEmail",
+    "params": "value",
+    "contract": "Accept only nonempty local parts at exactly vit.ac.in or vitstudent.ac.in.",
+    "example": [
+      "x@evilvit.ac.in"
+    ]
+  },
+  {
+    "module": "validation",
+    "name": "validTeamSize",
+    "params": "size, max",
+    "contract": "Team size is an integer in the inclusive interval 1..max.",
+    "example": [
+      4,
+      4
+    ]
+  },
+  {
+    "module": "validation",
+    "name": "parseSeats",
+    "params": "value",
+    "contract": "Accept only a positive safe integer written as decimal digits; invalid values return null.",
+    "example": [
+      "2e2"
+    ]
+  },
+  {
+    "module": "validation",
+    "name": "validRegistration",
+    "params": "value",
+    "contract": "Registration numbers contain exactly two digits, three letters and four digits; ignore case and edge whitespace.",
+    "example": [
+      "25BCE123"
+    ]
+  },
+  {
+    "module": "validation",
+    "name": "uniqueMembers",
+    "params": "members",
+    "contract": "Deduplicate members by normalised email while preserving the first original record.",
+    "example": [
+      [
+        {
+          "email": "A@vit.ac.in"
+        },
+        {
+          "email": "a@vit.ac.in"
+        }
+      ]
+    ]
+  },
+  {
+    "module": "validation",
+    "name": "validateCoordinates",
+    "params": "lat, lon",
+    "contract": "Latitude is in [-90,90], longitude in [-180,180]; both must be finite numbers.",
+    "example": [
+      12.97,
+      79.16
+    ]
+  },
+  {
+    "module": "validation",
+    "name": "requiredFields",
+    "params": "record, fields",
+    "contract": "Return missing field names; numeric zero and boolean false are present values.",
+    "example": [
+      {
+        "count": 0,
+        "active": false
+      },
+      [
+        "count",
+        "active"
+      ]
+    ]
+  },
+  {
+    "module": "catalog",
+    "name": "searchEvents",
+    "params": "events, query",
+    "contract": "Search name, description and tags, case-insensitively; blank query returns all.",
+    "example": [
+      [
+        {
+          "name": "Rovaris",
+          "description": "Rover lab",
+          "tags": []
+        }
+      ],
+      "ROVER"
+    ]
+  },
+  {
+    "module": "catalog",
+    "name": "filterByTag",
+    "params": "events, tags",
+    "contract": "An event must match ALL selected tags; no tags means no filtering; tag matching ignores case.",
+    "example": [
+      [
+        {
+          "id": "a",
+          "tags": [
+            "rover"
+          ]
+        },
+        {
+          "id": "b",
+          "tags": [
+            "rover",
+            "build"
+          ]
+        }
+      ],
+      [
+        "rover",
+        "build"
+      ]
+    ]
+  },
+  {
+    "module": "catalog",
+    "name": "sortByStart",
+    "params": "events",
+    "contract": "Return events by ascending start instant without changing the input array.",
+    "example": [
+      [
+        {
+          "id": "b",
+          "start": "2027-03-02T00:00:00Z"
+        },
+        {
+          "id": "a",
+          "start": "2027-03-01T00:00:00Z"
+        }
+      ]
+    ]
+  },
+  {
+    "module": "catalog",
+    "name": "paginate",
+    "params": "items, page, size",
+    "contract": "Pages are one-based; return at most size items; pages beyond the data are empty.",
+    "example": [
+      [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      1,
+      2
+    ]
+  },
+  {
+    "module": "catalog",
+    "name": "availableEvents",
+    "params": "events, bookings",
+    "contract": "Availability counts only confirmed seats, never waitlisted or cancelled seats.",
+    "example": [
+      [
+        {
+          "id": "a",
+          "capacity": 2
+        }
+      ],
+      [
+        {
+          "eventId": "a",
+          "status": "waitlisted",
+          "seats": 2
+        }
+      ]
+    ]
+  },
+  {
+    "module": "catalog",
+    "name": "registrationOpen",
+    "params": "event, now",
+    "contract": "Registration is open at opensAt and closed at closesAt; compare absolute instants.",
+    "example": [
+      {
+        "opensAt": "2027-01-01T00:00:00Z",
+        "closesAt": "2027-02-01T00:00:00Z"
+      },
+      "2027-02-01T00:00:00Z"
+    ]
+  },
+  {
+    "module": "catalog",
+    "name": "findEvent",
+    "params": "events, id",
+    "contract": "Find by trimmed case-insensitive ID, returning null for an unknown ID.",
+    "example": [
+      [
+        {
+          "id": "ROV",
+          "name": "Rovaris"
+        }
+      ],
+      " rov "
+    ]
+  },
+  {
+    "module": "catalog",
+    "name": "distinctTags",
+    "params": "events",
+    "contract": "Return sorted unique lowercase tags across all events.",
+    "example": [
+      [
+        {
+          "tags": [
+            "Build",
+            "rover"
+          ]
+        },
+        {
+          "tags": [
+            "build"
+          ]
+        }
+      ]
+    ]
+  },
+  {
+    "module": "booking",
+    "name": "occupiedSeats",
+    "params": "bookings, eventId",
+    "contract": "Sum only confirmed seats for the requested event.",
+    "example": [
+      [
+        {
+          "eventId": "r",
+          "status": "waitlisted",
+          "seats": 3
+        },
+        {
+          "eventId": "r",
+          "status": "confirmed",
+          "seats": 2
+        }
+      ],
+      "r"
+    ]
+  },
+  {
+    "module": "booking",
+    "name": "canReserve",
+    "params": "capacity, occupied, requested",
+    "contract": "Positive whole-seat requests may exactly fill remaining capacity.",
+    "example": [
+      10,
+      8,
+      2
+    ]
+  },
+  {
+    "module": "booking",
+    "name": "cancelBooking",
+    "params": "bookings, id",
+    "contract": "Cancel only the matching booking; retain every other record and do not mutate the input.",
+    "example": [
+      [
+        {
+          "id": "a",
+          "status": "confirmed"
+        },
+        {
+          "id": "b",
+          "status": "confirmed"
+        }
+      ],
+      "a"
+    ]
+  },
+  {
+    "module": "booking",
+    "name": "promoteWaitlist",
+    "params": "bookings, eventId, free",
+    "contract": "Scan waitlist in input order, skip non-fitting parties, and never promote beyond free seats.",
+    "example": [
+      [
+        {
+          "id": "a",
+          "eventId": "r",
+          "status": "waitlisted",
+          "seats": 2
+        },
+        {
+          "id": "b",
+          "eventId": "r",
+          "status": "waitlisted",
+          "seats": 2
+        },
+        {
+          "id": "c",
+          "eventId": "r",
+          "status": "waitlisted",
+          "seats": 1
+        }
+      ],
+      "r",
+      4
+    ]
+  },
+  {
+    "module": "booking",
+    "name": "duplicateBooking",
+    "params": "bookings, eventId, email",
+    "contract": "A same-event, normalised-email booking blocks duplicates unless cancelled.",
+    "example": [
+      [
+        {
+          "eventId": "r",
+          "email": "A@B.com",
+          "status": "confirmed"
+        }
+      ],
+      "r",
+      "a@b.com"
+    ]
+  },
+  {
+    "module": "booking",
+    "name": "remainingSeats",
+    "params": "capacity, occupied",
+    "contract": "Remaining capacity never becomes negative.",
+    "example": [
+      3,
+      5
+    ]
+  },
+  {
+    "module": "booking",
+    "name": "eventBookings",
+    "params": "bookings, eventId",
+    "contract": "Scope the booking list by eventId, not booking ID.",
+    "example": [
+      [
+        {
+          "id": "b1",
+          "eventId": "r"
+        },
+        {
+          "id": "b2",
+          "eventId": "a"
+        }
+      ],
+      "r"
+    ]
+  },
+  {
+    "module": "booking",
+    "name": "teamReady",
+    "params": "members, minimum",
+    "contract": "Team readiness requires enough distinct members and acceptance from every member.",
+    "example": [
+      [
+        {
+          "email": "a",
+          "accepted": true
+        },
+        {
+          "email": "b",
+          "accepted": false
+        }
+      ],
+      2
+    ]
+  },
+  {
+    "module": "pricing",
+    "name": "subtotal",
+    "params": "items",
+    "contract": "Line subtotal is unit paise times quantity, summed across all items.",
+    "example": [
+      [
+        {
+          "unitPaise": 10000,
+          "quantity": 3
+        },
+        {
+          "unitPaise": 5000,
+          "quantity": 2
+        }
+      ]
+    ]
+  },
+  {
+    "module": "pricing",
+    "name": "discountAmount",
+    "params": "amount, percent",
+    "contract": "Clamp percentage to 0..100 and round the calculated discount to integer paise.",
+    "example": [
+      10000,
+      10
+    ]
+  },
+  {
+    "module": "pricing",
+    "name": "couponValid",
+    "params": "coupon, now, amount",
+    "contract": "Coupons require active=true, startsAt <= now < expiresAt and subtotal >= minimum.",
+    "example": [
+      {
+        "active": true,
+        "startsAt": "2027-01-01",
+        "expiresAt": "2027-02-01",
+        "minPaise": 5000
+      },
+      "2027-01-15",
+      5000
+    ]
+  },
+  {
+    "module": "pricing",
+    "name": "taxAmount",
+    "params": "netPaise, rateBps",
+    "contract": "Tax basis points use 10000 = 100%; round once to integer paise.",
+    "example": [
+      10000,
+      1800
+    ]
+  },
+  {
+    "module": "pricing",
+    "name": "totalDue",
+    "params": "subtotalPaise, discountPaise, taxPaise",
+    "contract": "Clamp subtotal less discount at zero, then add tax.",
+    "example": [
+      10000,
+      1000,
+      1620
+    ]
+  },
+  {
+    "module": "pricing",
+    "name": "refundAmount",
+    "params": "paidPaise, hoursBefore",
+    "contract": "Refund is 100% at >=48 hours, floor(50%) at >=24 hours, otherwise zero.",
+    "example": [
+      10001,
+      48
+    ]
+  },
+  {
+    "module": "pricing",
+    "name": "splitCost",
+    "params": "totalPaise, people",
+    "contract": "Split integer paise evenly; assign one extra paise to the first remainder people.",
+    "example": [
+      100,
+      3
+    ]
+  },
+  {
+    "module": "pricing",
+    "name": "formatINR",
+    "params": "paise",
+    "contract": "Display paise as rupees with exactly two decimal places.",
+    "example": [
+      12345
+    ]
+  },
+  {
+    "module": "inventory",
+    "name": "availableQuantity",
+    "params": "item",
+    "contract": "Available equipment excludes reserved and damaged units, clamped at zero.",
+    "example": [
+      {
+        "stock": 10,
+        "reserved": 3,
+        "damaged": 2
+      }
+    ]
+  },
+  {
+    "module": "inventory",
+    "name": "reserveItems",
+    "params": "items, id, quantity",
+    "contract": "Add a validated reservation to existing reserved quantity for the matching item.",
+    "example": [
+      [
+        {
+          "id": "kit",
+          "reserved": 2
+        }
+      ],
+      "kit",
+      3
+    ]
+  },
+  {
+    "module": "inventory",
+    "name": "releaseItems",
+    "params": "items, id, quantity",
+    "contract": "Release reserved quantity without going below zero.",
+    "example": [
+      [
+        {
+          "id": "kit",
+          "reserved": 5
+        }
+      ],
+      "kit",
+      2
+    ]
+  },
+  {
+    "module": "inventory",
+    "name": "lowStock",
+    "params": "items, threshold",
+    "contract": "An item is low stock when usable availability is at or below the threshold.",
+    "example": [
+      [
+        {
+          "id": "kit",
+          "stock": 5,
+          "reserved": 2,
+          "damaged": 1
+        }
+      ],
+      2
+    ]
+  },
+  {
+    "module": "inventory",
+    "name": "bomRequirements",
+    "params": "bom, teams",
+    "contract": "Bill-of-materials demand equals per-team quantity multiplied by team count.",
+    "example": [
+      [
+        {
+          "itemId": "motor",
+          "perTeam": 4
+        }
+      ],
+      3
+    ]
+  },
+  {
+    "module": "inventory",
+    "name": "canFulfill",
+    "params": "items, requirements",
+    "contract": "Every requirement must have enough available units; an empty requirement list is fulfillable.",
+    "example": [
+      [
+        {
+          "id": "a",
+          "stock": 10,
+          "reserved": 0,
+          "damaged": 0
+        }
+      ],
+      [
+        {
+          "itemId": "a",
+          "quantity": 2
+        },
+        {
+          "itemId": "missing",
+          "quantity": 1
+        }
+      ]
+    ]
+  },
+  {
+    "module": "inventory",
+    "name": "restock",
+    "params": "items, id, quantity",
+    "contract": "Add delivered units to existing stock; preserve other records.",
+    "example": [
+      [
+        {
+          "id": "a",
+          "stock": 10
+        }
+      ],
+      "a",
+      2
+    ]
+  },
+  {
+    "module": "inventory",
+    "name": "equipmentCost",
+    "params": "requirements, items",
+    "contract": "Equipment cost sums unit paise times required quantity; unknown items contribute zero.",
+    "example": [
+      [
+        {
+          "itemId": "a",
+          "quantity": 3
+        }
+      ],
+      [
+        {
+          "id": "a",
+          "unitPaise": 200
+        }
+      ]
+    ]
+  },
+  {
+    "module": "schedule",
+    "name": "overlaps",
+    "params": "a, b",
+    "contract": "Use half-open intervals: adjacent sessions do not overlap.",
+    "example": [
+      {
+        "start": "2027-01-01T10:00:00Z",
+        "end": "2027-01-01T11:00:00Z"
+      },
+      {
+        "start": "2027-01-01T11:00:00Z",
+        "end": "2027-01-01T12:00:00Z"
+      }
+    ]
+  },
+  {
+    "module": "schedule",
+    "name": "durationMinutes",
+    "params": "start, end",
+    "contract": "Return elapsed minutes across date boundaries, using the explicit time-zone offsets.",
+    "example": [
+      "2027-01-01T22:00:00Z",
+      "2027-01-02T02:00:00Z"
+    ]
+  },
+  {
+    "module": "schedule",
+    "name": "sortSessions",
+    "params": "sessions",
+    "contract": "Sort by absolute instant rather than the written local date/time.",
+    "example": [
+      [
+        {
+          "id": "a",
+          "start": "2027-01-01T10:00:00+05:30"
+        },
+        {
+          "id": "b",
+          "start": "2027-01-01T05:00:00Z"
+        }
+      ]
+    ]
+  },
+  {
+    "module": "schedule",
+    "name": "conflicts",
+    "params": "sessions",
+    "contract": "Return each same-venue overlapping pair once in input order.",
+    "example": [
+      [
+        {
+          "id": "a",
+          "venue": "lab",
+          "start": "2027-01-01T10:00Z",
+          "end": "2027-01-01T11:00Z"
+        },
+        {
+          "id": "b",
+          "venue": "lab",
+          "start": "2027-01-01T10:30Z",
+          "end": "2027-01-01T12:00Z"
+        }
+      ]
+    ]
+  },
+  {
+    "module": "schedule",
+    "name": "minutesUntil",
+    "params": "start, now",
+    "contract": "Countdown rounds any positive partial minute up and clamps past sessions to zero.",
+    "example": [
+      "2027-01-01T10:01:01Z",
+      "2027-01-01T10:00:00Z"
+    ]
+  },
+  {
+    "module": "schedule",
+    "name": "withinWindow",
+    "params": "session, window",
+    "contract": "The entire session must fit inside the window; equal endpoints are allowed.",
+    "example": [
+      {
+        "start": "2027-01-01T09:00Z",
+        "end": "2027-01-01T11:00Z"
+      },
+      {
+        "start": "2027-01-01T10:00Z",
+        "end": "2027-01-01T12:00Z"
+      }
+    ]
+  },
+  {
+    "module": "schedule",
+    "name": "shiftSession",
+    "params": "session, minutes",
+    "contract": "Shift both start and end by minutes, preserving duration and extra fields.",
+    "example": [
+      {
+        "id": "a",
+        "start": "2027-01-01T23:30:00Z",
+        "end": "2027-01-02T00:30:00Z"
+      },
+      60
+    ]
+  },
+  {
+    "module": "schedule",
+    "name": "dayIndex",
+    "params": "start, eventStart",
+    "contract": "Event days are one-based elapsed 24-hour blocks measured from event start.",
+    "example": [
+      "2027-01-01T12:00Z",
+      "2027-01-01T10:00Z"
+    ]
+  },
+  {
+    "module": "telemetry",
+    "name": "mean",
+    "params": "values",
+    "contract": "Arithmetic mean; an empty series returns zero.",
+    "example": [
+      [
+        2,
+        4,
+        6
+      ]
+    ]
+  },
+  {
+    "module": "telemetry",
+    "name": "peak",
+    "params": "values",
+    "contract": "Maximum sample; an empty series returns zero.",
+    "example": [
+      [
+        2,
+        9,
+        3
+      ]
+    ]
+  },
+  {
+    "module": "telemetry",
+    "name": "movingAverage",
+    "params": "values, window",
+    "contract": "Trailing moving average includes the current point and at most window-1 preceding points.",
+    "example": [
+      [
+        2,
+        4,
+        8,
+        10
+      ],
+      2
+    ]
+  },
+  {
+    "module": "telemetry",
+    "name": "integrateDistance",
+    "params": "samples",
+    "contract": "Trapezoidal speed integration converts millisecond intervals to seconds; output is metres.",
+    "example": [
+      [
+        {
+          "tMs": 0,
+          "speed": 2
+        },
+        {
+          "tMs": 1000,
+          "speed": 4
+        }
+      ]
+    ]
+  },
+  {
+    "module": "telemetry",
+    "name": "batteryPercent",
+    "params": "voltage, minimum, maximum",
+    "contract": "Use linear interpolation between supplied min/max voltages, clamp to 0..100 and round.",
+    "example": [
+      11.1,
+      9,
+      12.6
+    ]
+  },
+  {
+    "module": "telemetry",
+    "name": "verticalVelocity",
+    "params": "samples",
+    "contract": "Successive altitude differences divided by positive elapsed seconds; nonpositive intervals yield zero.",
+    "example": [
+      [
+        {
+          "tMs": 0,
+          "altitude": 5
+        },
+        {
+          "tMs": 2000,
+          "altitude": 15
+        }
+      ]
+    ]
+  },
+  {
+    "module": "telemetry",
+    "name": "outliers",
+    "params": "values, threshold",
+    "contract": "Flag deviations strictly beyond threshold on either side of the mean; retain original indexes.",
+    "example": [
+      [
+        0,
+        10,
+        20
+      ],
+      5
+    ]
+  },
+  {
+    "module": "telemetry",
+    "name": "downsample",
+    "params": "values, stride",
+    "contract": "Keep indexes 0, stride, 2*stride, and so on for a positive integer stride.",
+    "example": [
+      [
+        10,
+        20,
+        30,
+        40,
+        50
+      ],
+      2
+    ]
+  },
+  {
+    "module": "analytics",
+    "name": "revenue",
+    "params": "bookings",
+    "contract": "Revenue includes paidPaise of confirmed bookings only.",
+    "example": [
+      [
+        {
+          "status": "confirmed",
+          "paidPaise": 5000
+        },
+        {
+          "status": "cancelled",
+          "paidPaise": 3000
+        }
+      ]
+    ]
+  },
+  {
+    "module": "analytics",
+    "name": "occupancyPercent",
+    "params": "occupied, capacity",
+    "contract": "Occupied seats divided by capacity as a rounded percentage; zero capacity gives zero.",
+    "example": [
+      25,
+      100
+    ]
+  },
+  {
+    "module": "analytics",
+    "name": "uniqueParticipants",
+    "params": "bookings",
+    "contract": "Count distinct normalised emails across confirmed bookings.",
+    "example": [
+      [
+        {
+          "status": "confirmed",
+          "email": "A@B.com"
+        },
+        {
+          "status": "confirmed",
+          "email": " a@b.com "
+        }
+      ]
+    ]
+  },
+  {
+    "module": "analytics",
+    "name": "groupByEvent",
+    "params": "bookings",
+    "contract": "Group all bookings under eventId, preserving record order.",
+    "example": [
+      [
+        {
+          "id": "b",
+          "eventId": "r"
+        }
+      ]
+    ]
+  },
+  {
+    "module": "analytics",
+    "name": "completionPercent",
+    "params": "done, total",
+    "contract": "Task completion is rounded and clamped to 0..100; nonpositive total gives zero.",
+    "example": [
+      15,
+      10
+    ]
+  },
+  {
+    "module": "analytics",
+    "name": "median",
+    "params": "values",
+    "contract": "Numeric median; even-length lists average the two central values; empty gives zero.",
+    "example": [
+      [
+        2,
+        10,
+        3
+      ]
+    ]
+  },
+  {
+    "module": "analytics",
+    "name": "topEvents",
+    "params": "events, totals, limit",
+    "contract": "Rank by descending totals; break ties by ascending ID and limit result length.",
+    "example": [
+      [
+        {
+          "id": "a"
+        },
+        {
+          "id": "b"
+        },
+        {
+          "id": "c"
+        }
+      ],
+      {
+        "a": 2,
+        "b": 5,
+        "c": 1
+      },
+      2
+    ]
+  },
+  {
+    "module": "analytics",
+    "name": "csvCell",
+    "params": "value",
+    "contract": "CSV cells containing quotes, commas or newlines are quoted and internal quotes doubled.",
+    "example": [
+      "A,\"B\""
+    ]
+  },
+  {
+    "module": "storage",
+    "name": "parseSnapshot",
+    "params": "raw, fallback",
+    "contract": "Only object snapshots are accepted; invalid JSON, arrays, null and primitives use a cloned fallback.",
+    "example": [
+      "[]",
+      {
+        "version": 1
+      }
+    ]
+  },
+  {
+    "module": "storage",
+    "name": "migrateSnapshot",
+    "params": "snapshot",
+    "contract": "Migrate v1 quantity to v2 seats, preserving an existing seats value and every unrelated field.",
+    "example": [
+      {
+        "version": 1,
+        "bookings": [
+          {
+            "id": "a",
+            "quantity": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "module": "storage",
+    "name": "upsertById",
+    "params": "records, record",
+    "contract": "Merge updates by ID with incoming fields winning; append unknown IDs; preserve unrelated fields.",
+    "example": [
+      [
+        {
+          "id": "a",
+          "seats": 1,
+          "name": "Ada"
+        }
+      ],
+      {
+        "id": "a",
+        "seats": 3
+      }
+    ]
+  },
+  {
+    "module": "storage",
+    "name": "removeById",
+    "params": "records, id",
+    "contract": "Remove only the requested ID and clone retained records.",
+    "example": [
+      [
+        {
+          "id": "a"
+        },
+        {
+          "id": "b"
+        }
+      ],
+      "a"
+    ]
+  },
+  {
+    "module": "storage",
+    "name": "cacheFresh",
+    "params": "entry, nowMs, ttlMs",
+    "contract": "Freshness is 0 <= age < TTL; future-dated entries are not fresh.",
+    "example": [
+      {
+        "savedAt": 1000
+      },
+      2000,
+      1000
+    ]
+  },
+  {
+    "module": "storage",
+    "name": "patchPreferences",
+    "params": "current, patch",
+    "contract": "Only theme, pageSize and eventId can be patched; explicit falsy values are retained.",
+    "example": [
+      {
+        "theme": "dark",
+        "pageSize": 10,
+        "eventId": "r"
+      },
+      {
+        "eventId": ""
+      }
+    ]
+  },
+  {
+    "module": "storage",
+    "name": "mergeSnapshots",
+    "params": "local, incoming",
+    "contract": "Merge by ID, choosing the greatest numeric updatedAt; incoming wins ties; preserve first-seen ID order.",
+    "example": [
+      [
+        {
+          "id": "a",
+          "updatedAt": 1,
+          "value": "old"
+        }
+      ],
+      [
+        {
+          "id": "a",
+          "updatedAt": 2,
+          "value": "new"
+        }
+      ]
+    ]
+  },
+  {
+    "module": "storage",
+    "name": "retainAudit",
+    "params": "entries, limit",
+    "contract": "Keep the last limit audit entries in chronological input order; nonpositive limit gives empty.",
+    "example": [
+      [
+        {
+          "id": "a"
+        },
+        {
+          "id": "b"
+        },
+        {
+          "id": "c"
+        }
+      ],
+      2
+    ]
+  }
+]

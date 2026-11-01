@@ -1,0 +1,16 @@
+{
+  "name": "the-ugly-repo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "VIT-Stellar junior core debugging challenge: event operations sandbox",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "dev": "node --watch src/server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node scripts/check.mjs"
+  }
+}
