@@ -4,7 +4,7 @@ export function revenue(bookings) {
 
 export function occupancyPercent(occupied, capacity) {
   if (capacity <= 0) return 0;
-  return Math.round(capacity / occupied * 100);
+  return Math.round(occupied / capacity * 100);
 }
 
 export function uniqueParticipants(bookings) {
