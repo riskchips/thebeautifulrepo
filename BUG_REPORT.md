@@ -6,29 +6,30 @@ Setup/environment:  node
 
 ## Summary
 
-Fixed the event explorer so its first page displays the expected events, filtered results are visible, and catalog ordering and filters follow the specification.
+Corrected pricing calculations to consistently use paise and to match the pricing contracts in `SPEC.md`. Added direct pricing-helper tests and an end-to-end quote regression test.
 
-## Fix — Show all event explorer results and honor filters
+## Fix — Correct price calculations and paise formatting
 
-- **Impact / priority:** Medium — the explorer displayed an incomplete event list, and filtered matches could appear to be missing, making search and registration availability harder to use.
-- **Reproduction steps:** Open Event explorer with the seed data. It reports 3 matching events but shows only Rovaris on page 1 of 2. Search for `rocket` and apply the filter; the count changes to 1 matching event, but no event card appears.
-- **Expected behaviour:** Per `SPEC.md`, catalog pages are one-based, event results are sorted by ascending start time, all selected tags must match, availability counts confirmed seats only, and the tag list contains unique lowercase values. Page 1 should show Rovaris and Aerovate; page 2 should show Celestial Dive. Searching `rocket` should show Aerovate.
-- **Actual behaviour before the fix:** Pagination started at the second page-sized slice for page 1, so only one event appeared on page 1 and single-result searches returned an empty page. Sorting was newest-first. Tag filtering used any selected tag, waitlisted seats reduced availability, and the tag list included duplicates.
-- **Root cause:** `paginate` used the one-based page number as a zero-based offset. Related catalog helpers also contradicted their documented ordering and filtering behavior.
-- **Files changed:** `src/domain/catalog.mjs`, `tests/smoke.test.mjs`.
-- **Fix:** Corrected the pagination offset, sorted events by ascending start time, required all selected tags to match, counted confirmed seats for availability, and deduplicated tag options.
-- **Verification:** Ran `npm test` — all 23 tests passed. Regression checks cover both pages, search, tags, availability, and unique tags. In a fresh browser session, page 1 showed Rovaris and Aerovate, applying a `rocket` search showed Aerovate, and page 2 showed Celestial Dive.
-- **Evidence:** Event explorer API and catalog regression tests in `tests/smoke.test.mjs`.
+- **Impact / priority:** High — ticket quotes, discounts, tax, totals, splits, refunds, and displayed INR amounts could all be incorrect.
+- **Reproduction steps:** Request a quote for a Rovaris ticket, or run the pricing operations with values from the supplied pricing example. For a Rovaris ticket priced at 25,000 paise, quote 2 seats without a coupon.
+- **Expected behaviour:** Per `SPEC.md`, subtotal is unit paise times quantity; percentage calculations use their stated percent or basis-point units; discounts are subtracted; and displayed rupees convert 100 paise to ₹1.00. The catalog fares are Rovaris ₹250 per seat (25,000 paise), Aerovate ₹350 (35,000 paise), and Celestial Dive ₹150 (15,000 paise). For 2 Rovaris seats without a coupon, expect subtotal 50,000 paise, tax 2,500 paise at 500 bps, total 52,500 paise, formatted as `₹525.00`, and a split of `[26250, 26250]`.
+- **Actual behaviour before the fix:** The supplied quote reported `subtotalPaise: 25002` and `taxPaise: 125010`; its `totalPaise` was formed by adding the discount, its split could allocate an extra paise, and INR formatting treated 10 paise as one rupee.
+- **Root cause:** Pricing helpers used addition rather than multiplication for line totals, incorrect divisors for percent and basis-point calculations, an exclusive coupon minimum, discount addition instead of subtraction, a strict full-refund threshold, an off-by-one split remainder, and incorrect paise-to-rupee conversion.
+- **Files changed:** `src/domain/pricing.mjs`, `tests/pricing.test.mjs`, `tests/smoke.test.mjs`.
+- **Fix:** Corrected subtotal, percentage discount, coupon minimum boundary, tax, discounted total, refund threshold, remainder distribution, and INR conversion to match `SPEC.md`.
+- **Verification:** Ran `npm test` — all 33 tests passed. Unit tests cover each pricing contract; the API regression verifies each event's base price, one-seat quote, and two-seat Rovaris total.
+- **Evidence:** Pricing contract tests in `tests/pricing.test.mjs` and catalog fare/quote regression in `tests/smoke.test.mjs`.
 
 ## Regression checks
 
-- `npm test` — passed; 23 tests, 0 failures, including pagination and filter regressions.
-- Verified the explorer in a fresh browser session: both page 1 cards appeared, applying the `rocket` filter displayed Aerovate, and page 2 displayed Celestial Dive.
+- `npm test` — passed; 33 tests, 0 failures, including the catalog-fare assertions.
+- Quote regression verified 50,000 subtotal paise, 2,500 tax paise, 52,500 total paise, `₹525.00`, and an even split of 26,250 paise per seat.
+- Catalog fare regression verifies the displayed base fares are ₹250, ₹350, and ₹150 per seat, and one-seat quotes preserve those base prices before the specified 5% demo tax.
 
 ## Known remaining issues
 
-List unresolved defects and any incomplete work without claiming them as fixed.
+No known remaining issues related to this pricing fix.
 
 ## Credits
 
-Credit reused code, assets, libraries and source projects.
+No external code or assets reused.
